@@ -146,9 +146,9 @@ def modelwater(dryspectra,SMCs,device='cpu'):
     wet_spectra_np = wet_spectra.cpu().detach().numpy()
     wet_spectra_smooth_m = savgol_filter(wet_spectra_np, window_length=50, polyorder=2, axis=1)
     wet_spectra_smooth_se = savgol_filter(wet_spectra_np, window_length=150, polyorder=2, axis=1)
-    wet_spectra_smooth_se2 = savgol_filter(wet_spectra_np, window_length=250, polyorder=2, axis=1)
+    wet_spectra_smooth_se2 = savgol_filter(wet_spectra_np, window_length=300, polyorder=2, axis=1)
     wet_spectra_smooth_se[:,200:1700] = wet_spectra_smooth_m[:,200:1700]
-    wet_spectra_smooth_se[:,500:900] = wet_spectra_smooth_se2[:,500:900]
+    wet_spectra_smooth_se[:,500:850] = wet_spectra_smooth_se2[:,500:850]
     wet_spectra = torch.from_numpy(wet_spectra_smooth_se).to(device_)
     wet_spectra = wet_spectra.clamp(min=0)
     wet_spectra[wet_spectra>dryspectra] = dryspectra[wet_spectra>dryspectra]
