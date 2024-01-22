@@ -18,7 +18,7 @@ def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torc
     # Instantiate the model
     PSmodel = PS.SSAE(embedsize, channelsize, headnum, bandwidth, bandnum).to(device)
     current_directory = os.getcwd()
-    weights_folder = os.path.join(current_directory, 'Models/spectrapad/PS_para_22934.pth')
+    weights_folder = os.path.join(current_directory, 'Models/spectrapad/PS_para.pth')
     PSmodel.load_state_dict(torch.load(weights_folder, map_location=device))
     PSmodel.eval()
 

@@ -133,7 +133,7 @@ def modelwater(dryspectra,SMCs,device='cpu'):
     device_ = torch.device(device)
     WUtest = WaterUNet(80).to(device_)
     current_directory = os.getcwd()
-    weights_folder = os.path.join(current_directory, 'Models/water/WU_para_5200.pth')
+    weights_folder = os.path.join(current_directory, 'Models/water/WU_para.pth')
     WUtest.load_state_dict(torch.load(weights_folder, map_location=torch.device(device_)))
     WUtest.eval()
 
