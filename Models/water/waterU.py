@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 from scipy.signal import savgol_filter
+import os
 
 class DoubleConv(nn.Module):
     def __init__(self, in_channels, out_channels, mid_channels=None, kernel_size=5,):
@@ -131,7 +132,9 @@ class WaterUNet(nn.Module):
 def modelwater(dryspectra,SMCs,device='cpu'):
     device_ = torch.device(device)
     WUtest = WaterUNet(80).to(device_)
-    WUtest.load_state_dict(torch.load('/home/tlei/PycharmProjects/SOLGM/Models/water/WU_para_5200.pth', map_location=torch.device(device_)))
+    current_directory = os.getcwd()
+    weights_folder = os.path.join(current_directory, 'Models/water/WU_para_5200.pth')
+    WUtest.load_state_dict(torch.load(weights_folder, map_location=torch.device(device_)))
     WUtest.eval()
 
     wet_spectra_dff = WUtest(dryspectra.clone().to(device_), SMCs.clone().to(device_))
@@ -143,7 +146,9 @@ def modelwater(dryspectra,SMCs,device='cpu'):
     wet_spectra_np = wet_spectra.cpu().detach().numpy()
     wet_spectra_smooth_m = savgol_filter(wet_spectra_np, window_length=50, polyorder=2, axis=1)
     wet_spectra_smooth_se = savgol_filter(wet_spectra_np, window_length=150, polyorder=2, axis=1)
+    wet_spectra_smooth_se2 = savgol_filter(wet_spectra_np, window_length=250, polyorder=2, axis=1)
     wet_spectra_smooth_se[:,200:1700] = wet_spectra_smooth_m[:,200:1700]
+    wet_spectra_smooth_se[:,500:900] = wet_spectra_smooth_se2[:,500:900]
     wet_spectra = torch.from_numpy(wet_spectra_smooth_se).to(device_)
     wet_spectra = wet_spectra.clamp(min=0)
     wet_spectra[wet_spectra>dryspectra] = dryspectra[wet_spectra>dryspectra]

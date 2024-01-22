@@ -2,7 +2,7 @@ import Models.spectrapad.PSmodel as PS
 import torch
 from scipy.signal import savgol_filter
 from scipy.interpolate import interp1d
-
+import os
 
 def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torch.arange(400, 2500, 1)):
     device_o = spectra.device
@@ -17,7 +17,9 @@ def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torc
 
     # Instantiate the model
     PSmodel = PS.SSAE(embedsize, channelsize, headnum, bandwidth, bandnum).to(device)
-    PSmodel.load_state_dict(torch.load('/home/tlei/PycharmProjects/SOLGM/Models/spectrapad/PS_para_22934.pth', map_location=device))
+    current_directory = os.getcwd()
+    weights_folder = os.path.join(current_directory, 'Models/spectrapad/PS_para_22934.pth')
+    PSmodel.load_state_dict(torch.load(weights_folder, map_location=device))
     PSmodel.eval()
 
     spectra_ts = spectra.clone().detach().to(device)
