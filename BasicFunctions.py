@@ -1,7 +1,9 @@
-# Function check if a string is a float
+# Description: This file contains the basic functions used for the SOGM model
 import torch
 import numpy as np
 import json
+
+# Function check if a string is a float
 def isfloat(value):
     try:
         float(value)
