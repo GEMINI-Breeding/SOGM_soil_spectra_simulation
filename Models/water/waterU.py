@@ -128,10 +128,10 @@ class WaterUNet(nn.Module):
         x = self.out_conv(x0_up)
         return x.squeeze(1)
 
-def modelwater(dryspectra,SMCs,device='cpu',tag=''):
+def modelwater(dryspectra,SMCs,device='cpu'):
     device_ = torch.device(device)
     WUtest = WaterUNet(80).to(device_)
-    WUtest.load_state_dict(torch.load('/home/tlei/PycharmProjects/SOLGM/Models/water/WU_para'+tag+'.pth', map_location=torch.device(device_)))
+    WUtest.load_state_dict(torch.load('/home/tlei/PycharmProjects/SOLGM/Models/water/WU_para_5200.pth', map_location=torch.device(device_)))
     WUtest.eval()
 
     wet_spectra_dff = WUtest(dryspectra.clone().to(device_), SMCs.clone().to(device_))

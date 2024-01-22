@@ -5,8 +5,8 @@ from Models.spectragen import SPEncoder as PEn
 from Models.spectragen import SOD_model as SOD
 
 def initializemodel(device):
-    number_index = 0
-    num_uniqwords = 509
+    number_index = 0 # define the index of the number token
+    num_uniqwords = 509 # define the number of unique words in the vocabulary
     pad_index = 509  # define the padding index (last index of the vocabulary)
     vocab_size = 510  # define the vocabulary size (add 1 for padding)
     embeddingsz_t = 250
@@ -18,8 +18,7 @@ def initializemodel(device):
     Pencoder.to(device)
     Pencoder.eval()
 
-
-    n_steps = 300
+    n_steps = 300 # define the number of steps for the diffusion process
     diffusionmodel = SOD.DDPM(n_steps, min_beta=10 ** -4, max_beta=0.02,device=device).to(device)
     diffusionmodel.load_state_dict(torch.load('/home/tlei/PycharmProjects/SOLGM/Models/spectragen/DF_para.pth', map_location=torch.device(device)))
     diffusionmodel.to(device)
@@ -41,7 +40,7 @@ def writespectra(wavelength,spectra_gen, filename):
     plt.xlabel(x_label, fontsize=fontsz)
     plt.ylabel(y_label, fontsize=fontsz)
     # plt.title(title, fontsize=fontsz)
-    # plt.legend(['Generated', 'True'], fontsize=fontsz)
+    # plt.legend([''], fontsize=fontsz)
     # Set axis limits
     plt.xlim(x_limit)
     plt.ylim(y_limit)
@@ -64,7 +63,7 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
 
         device = diffusionmodel.device
 
-        # Starting from random noise
+        # Initialize random noise
         if series:
             x = torch.randn(1, l)
             x = x.repeat(n_samples, 1)
@@ -97,10 +96,8 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
                 else:
                     z = torch.randn(n_samples, l).to(device)
 
-                # # Option 1: sigma_t squared = beta_t
-                beta_t = diffusionmodel.betas[t]
 
-                # # Option 2: sigma_t squared = beta_tilda_t
+                beta_t = diffusionmodel.betas[t]
                 prev_alpha_t_bar = diffusionmodel.alpha_bars[t - 1] if t > 0 else diffusionmodel.alphas[0]
                 beta_tilda_t = ((1 - prev_alpha_t_bar) / (1 - alpha_t_bar)) * beta_t
                 sigma_t = beta_tilda_t.sqrt()
@@ -112,7 +109,7 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
 
         return x
 
-def generatespectra(textidx_input, device,series = False, plotprocess = None, wavelength =  torch.arange(400, 2500, 1)):
+def generatespectra(textidx_input, device,series = False, wavelength =  torch.arange(400, 2500, 1)):
 
     Pencoder, diffusionmodel = initializemodel(device)
     n_samples = textidx_input.shape[0]
@@ -121,7 +118,7 @@ def generatespectra(textidx_input, device,series = False, plotprocess = None, wa
     l = len(wavelength)
     with torch.no_grad():
         l_half = l // 2
-        spectra_gen = reversediffusion(diffusionmodel, textemb_input.clone(), n_samples, l_half, series, plotprocess)
+        spectra_gen = reversediffusion(diffusionmodel, textemb_input.clone(), n_samples, l_half, series)
     spectra_gen = spectra_gen.cpu().numpy()
     spectra_gen_last = spectra_gen[:, -1]
     wavelength_o = wavelength[::2]
@@ -130,3 +127,14 @@ def generatespectra(textidx_input, device,series = False, plotprocess = None, wa
     spectra_gen[:, -1] = spectra_gen_last
 
     return spectra_gen
+
+def plotgeneration(textidx_input, device,series = False, plotprocess = None, wavelength =  torch.arange(400, 2500, 1)):
+
+    Pencoder, diffusionmodel = initializemodel(device)
+    n_samples = textidx_input.shape[0]
+    textidx_input_t = textidx_input.clone().to(device)
+    textemb_input = Pencoder(textidx_input_t)
+    l = len(wavelength)
+    with torch.no_grad():
+        l_half = l // 2
+        reversediffusion(diffusionmodel, textemb_input.clone(), n_samples, l_half, series, plotprocess)
