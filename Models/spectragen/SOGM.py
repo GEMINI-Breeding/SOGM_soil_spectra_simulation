@@ -2,7 +2,7 @@ import torch
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
 from Models.spectragen import SPEncoder as PEn
-from Models.spectragen import SOD_model as SOD
+from Models.spectragen import diffusion
 import os
 
 def initializemodel(device):
@@ -13,6 +13,7 @@ def initializemodel(device):
     embeddingsz_t = 250
     head_num = 10
 
+    # Initialize property embedding model
     Pencoder = PEn.SPEncod(embeddingsz_t, head_num, vocab_size, pad_index, number_index, 256, 16).to(device)
     current_directory = os.getcwd()
     weights_pe_folder = os.path.join(current_directory, 'Models/spectragen/PE_para.pth')
@@ -20,8 +21,9 @@ def initializemodel(device):
     Pencoder.to(device)
     Pencoder.eval()
 
+    # Initialize diffusion model
     n_steps = 300 # define the number of steps for the diffusion process
-    diffusionmodel = SOD.DDPM(n_steps, min_beta=10 ** -4, max_beta=0.02,device=device).to(device)
+    diffusionmodel = diffusion.DDPM(n_steps, min_beta=10 ** -4, max_beta=0.02,device=device).to(device)
     current_directory = os.getcwd()
     weights_df_folder = os.path.join(current_directory, 'Models/spectragen/DF_para.pth')
     diffusionmodel.load_state_dict(torch.load(weights_df_folder, map_location=torch.device(device)))
@@ -78,7 +80,6 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
         for idx, t in enumerate(list(range(diffusionmodel.n_steps))[::-1]):
 
             # Estimating noise to be removed
-
             t_step = (torch.ones(n_samples) * t).to(device).long()
             eta_theta = diffusionmodel.backward(x.clone(), textemb_input.clone(), t_step)
 
@@ -100,7 +101,6 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
                 else:
                     z = torch.randn(n_samples, l).to(device)
 
-
                 beta_t = diffusionmodel.betas[t]
                 prev_alpha_t_bar = diffusionmodel.alpha_bars[t - 1] if t > 0 else diffusionmodel.alphas[0]
                 beta_tilda_t = ((1 - prev_alpha_t_bar) / (1 - alpha_t_bar)) * beta_t
@@ -108,8 +108,6 @@ def reversediffusion(diffusionmodel, textemb_input, n_samples, l, series = False
 
                 # Adding some more noise like in Langevin Dynamics fashion
                 x = x + sigma_t * z
-
-
 
         return x
 
