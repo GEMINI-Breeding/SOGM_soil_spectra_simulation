@@ -117,7 +117,7 @@ def setProp(specbrand, clay, silt, SOM, nitrogen, CEC, OC, tP, pH_w, Fe, dens, e
     if tP >= 0:
         prop = prop + ['Total phosphorus content : ' + str(tP) + ' mg/kg']
     if pH_w >= 0:
-        prop = prop + ['pH measured from wetspectra solution : ' + str(pH_w)]
+        prop = prop + ['pH measured from water solution : ' + str(pH_w)]
     if Fe >= 0:
         prop = prop + ['Iron content : ' + str(Fe) + ' mg/kg']
     if dens >= 0:
