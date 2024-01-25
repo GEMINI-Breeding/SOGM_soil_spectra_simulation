@@ -1,4 +1,4 @@
-import Models.spectrapad.PSmodel as PS
+import core.spectrapad.PSmodel as PS
 import torch
 from scipy.signal import savgol_filter
 from scipy.interpolate import interp1d
@@ -18,7 +18,7 @@ def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torc
     # Instantiate the model
     PSmodel = PS.SSAE(embedsize, channelsize, headnum, bandwidth, bandnum).to(device)
     current_directory = os.getcwd()
-    weights_folder = os.path.join(current_directory, 'Models/spectrapad/PS_para.pth')
+    weights_folder = os.path.join(current_directory, 'core/spectrapad/PS_para.pth')
     PSmodel.load_state_dict(torch.load(weights_folder, map_location=device))
     PSmodel.eval()
 
@@ -30,7 +30,7 @@ def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torc
 
     mask1 = (spectra > 0) & (spectra < 1)
     spectra_pad_cpu[mask1] = spectra[mask1]
-    spectra_pad_np = savgol_filter(spectra_pad_cpu, window_length=100, polyorder=2)
+    spectra_pad_np = savgol_filter(spectra_pad_cpu, window_length=75, polyorder=2)
 
     spectra_pad_sn = torch.tensor([]).to(device)
     for irow in range(spectra_ts.shape[0]):

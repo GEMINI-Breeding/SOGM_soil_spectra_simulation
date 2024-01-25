@@ -1,8 +1,8 @@
 import torch
 from scipy.interpolate import interp1d
 import matplotlib.pyplot as plt
-from Models.spectragen import SPEncoder as PEn
-from Models.spectragen import diffusion
+from core.spectragen import SPEncoder as PEn
+from core.spectragen import diffusion
 import os
 
 def initializemodel(device):
@@ -16,7 +16,7 @@ def initializemodel(device):
     # Initialize property embedding model
     Pencoder = PEn.SPEncod(embeddingsz_t, head_num, vocab_size, pad_index, number_index, 256, 16).to(device)
     current_directory = os.getcwd()
-    weights_pe_folder = os.path.join(current_directory, 'Models/spectragen/PE_para.pth')
+    weights_pe_folder = os.path.join(current_directory, 'core/spectragen/PE_para.pth')
     Pencoder.load_state_dict(torch.load(weights_pe_folder, map_location=torch.device(device)))
     Pencoder.to(device)
     Pencoder.eval()
@@ -25,7 +25,7 @@ def initializemodel(device):
     n_steps = 300 # define the number of steps for the diffusion process
     diffusionmodel = diffusion.DDPM(n_steps, min_beta=10 ** -4, max_beta=0.02,device=device).to(device)
     current_directory = os.getcwd()
-    weights_df_folder = os.path.join(current_directory, 'Models/spectragen/DF_para.pth')
+    weights_df_folder = os.path.join(current_directory, 'core/spectragen/DF_para.pth')
     diffusionmodel.load_state_dict(torch.load(weights_df_folder, map_location=torch.device(device)))
     diffusionmodel.to(device)
     diffusionmodel.eval()
