@@ -1,6 +1,5 @@
 # SOGM
-The Soil Optical Generative Model (SOGM) is a soil spectra simulation model that utilizes the Denoising Diffusion Probabilistic Model (DDPM).
-
-It incorporates two sub-models: spectra padding model and wet soil spectra model.
+The Soil Optical Generative Model (SOGM) is a soil spectra simulation model that utilizes the Denoising Diffusion Probabilistic Model (DDPM). The model generates soil reflectance spectra from text-based inputs describing soil properties and their values rather than only numerical values and labels in binary vector format, which means the model can handle variable formats for property reporting. Because the model is generative, it can simulate reasonable output spectra based on an incomplete set of available input properties, which becomes more constrained as the input property set becomes more complete. Two additional sub-models were also built to complement the SOGM: a spectral padding model that can fill in the gaps for spectra shorter than the target visible-near-infrared range (VIS-NIR; 400 to 2499 nm), and a wet soil spectra model that can estimate the effects of water content on soil reflectance spectra given the dry spectrum predicted by the SOGM.
 
 Additionally, the SOGM is packaged with the PROSAIL model, which combines the PROSPECT-5, D, and 4SAIL models.
+
