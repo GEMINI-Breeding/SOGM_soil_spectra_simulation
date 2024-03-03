@@ -3,4 +3,4 @@ The Soil Optical Generative Model (SOGM) is a soil spectra simulation model that
 
 Additionally, the SOGM is packaged with the PROSAIL model, which combines the PROSPECT-5, D, and 4SAIL models.
 
-Citation: Lei, T., and Bailey, B.N., Soil Optical Generative Model for 3D Plant and Radiative Transfer Modelling. American Geophysical Union Fall Meeting (2023). San Fransico, California.
+Citation: Lei, T., and Bailey, B.N., (2023). Soil Optical Generative Model for 3D Plant and Radiative Transfer Modelling. American Geophysical Union Fall Meeting. San Fransico, California.
