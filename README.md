@@ -7,7 +7,7 @@ Citation: Lei, T., & Bailey, B. N. (2024). A text-based, generative deep learnin
 
 Example of input properties:
 
-Coarse fragments : 1 %
+Coarse fragments : 1 %\\
 Clay content : 1 %
 Silt content : 1 %
 Sand content : 1 %
