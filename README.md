@@ -6,34 +6,59 @@ Additionally, the SOGM is packaged with the PROSAIL model, which combines the PR
 Citation: Lei, T., & Bailey, B. N. (2024). A text-based, generative deep learning model for soil reflectance spectrum simulation in the VIS-NIR (400-2499 nm) bands. arXiv preprint arXiv:2405.01060.
 
 Example of input properties:
-"""
+
 Coarse fragments : 1 %
+
 Clay content : 1 %
+
 Silt content : 1 %
+
 Sand content : 1 %
+
 Bulk density : 1 g/cm3
+
 Soil organic matter : 1 g/kg
+
 Total carbon content : 1 g/kg
+
 Organic carbon content : 1 g/kg
+
 pH measured from CaCl2 solution : 1
+
 pH measured from water solution : 1
+
 Electrical conductivity : 1 mS/m
+
 CaCO3 content : 1 g/kg
+
 Total nitrogen content : 1 g/kg
+
 Extractable phosphorus content : 1 mg/kg
+
 Extractable potassium content : 1 mg/kg
+
 Cation exchange capacity : 1 cmol(+)/kg
+
 The primary land cover : Maize
+
 The primary land use : Forestry
+
 Percentage of stones in soil : <10 %
+
 Country : United States
-Province/State : Sao Paulo
+
 Total magnesium content : 1 mg/kg
+
 Total aluminium content : 1 mg/kg
+
 Total phosphorus content : 1 mg/kg
+
 Total calcium content : 1 mg/kg
+
 Total manganese content : 1 mg/kg
+
 Total iron content : 1 mg/kg
+
 Total zinc content : 1 mg/kg
+
 Total nickel content : 1 mg/kg
-"""
