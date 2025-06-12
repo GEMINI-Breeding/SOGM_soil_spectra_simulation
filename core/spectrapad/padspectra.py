@@ -1,61 +1,31 @@
-import core.spectrapad.PSmodel as PS
+import core.spectrapad.padmodel as PS
 import torch
 from scipy.signal import savgol_filter
 from scipy.interpolate import interp1d
 import os
 
-def padspectra(spectra, device= torch.device("cuda"),padgap = 50,wavelength=torch.arange(400, 2500, 1)):
-    device_o = spectra.device
-    embedsize = 200
-    channelsize = 120
-    headnum = 10
-    # Set default wavelength
-    wavelength4 = torch.cat((wavelength[::4], wavelength[-1:]),dim=0)  # Note the change in dim from 1 to 0 for 1D tensor
-
+def run_padmodel(spectra, device= torch.device("cuda")):
+    # add 50 zeros to the start of the spectra
+    spectra = torch.cat((torch.zeros(spectra.shape[0], 50), spectra), dim=1)
+    bandnum = 43
     bandwidth = 50
-    bandnum = len(wavelength) // bandwidth  # 42
+    vocab_size = 27
+    hidden_dim = 160
+    pad_index = 26
+    maxwords = 4
+    spectra_input = spectra.reshape(spectra.shape[0],bandnum, bandwidth)  # shape: (batch, bandnum, bandwidth)
+    propdata_input = torch.tensor([14.,  0., 17., 26.]).unsqueeze(0).unsqueeze(0).repeat(spectra_input.shape[0],1,1).to(device)
 
-    # Instantiate the model
-    PSmodel = PS.SSAE(embedsize, channelsize, headnum, bandwidth, bandnum).to(device)
-    current_directory = os.getcwd()
-    weights_folder = os.path.join(current_directory, 'core/spectrapad/PS_para.pth')
-    PSmodel.load_state_dict(torch.load(weights_folder, map_location=device))
-    PSmodel.eval()
+    areg = PS.AutoRegression(8,8,vocab_size, pad_index, bandwidth=bandwidth, maxwords = maxwords, bandnum=bandnum, moe_noise_std = 0.,hidden_dim=hidden_dim)
 
-    spectra_ts = spectra.clone().detach().to(device)
+    # load the model state
+    areg.load_state_dict(torch.load('core/spectrapad/spectra_pad_param.pth', map_location=device))
+    areg.eval()
 
-    spectra_pad = PSmodel(spectra_ts)
-    f = interp1d(wavelength4, spectra_pad.detach().cpu().numpy(), kind='cubic')
-    spectra_pad_cpu = f(wavelength)
-
-    mask1 = (spectra > 0) & (spectra < 1)
-    spectra_pad_cpu[mask1] = spectra[mask1]
-    spectra_pad_np = savgol_filter(spectra_pad_cpu, window_length=75, polyorder=2)
-
-    spectra_pad_sn = torch.tensor([]).to(device)
-    for irow in range(spectra_ts.shape[0]):
-        spectrum_ts = spectra_ts[irow, :].float().to(device)
-        spectrum_pad_np = torch.tensor(spectra_pad_np[irow, :]).float().to(device)
-        maskidx = spectrum_ts.nonzero(as_tuple=True)[0]
-        maskidx, _ = torch.sort(maskidx)
-        if maskidx[0] > 0:
-            startidx = maskidx[:padgap]
-            startratio = torch.linspace(1, 0, padgap).to(device)
-            spectrum_pad_np[startidx] = spectrum_pad_np[startidx] * startratio + spectrum_ts[startidx] * (1 - startratio)
-            maskidx = maskidx[padgap:]
-        if maskidx[-1] < 2099:
-            endidx = maskidx[-padgap:]
-            endratio = torch.linspace(0, 1, padgap).to(device)
-            spectrum_pad_np[endidx] = spectrum_pad_np[endidx] * endratio + spectrum_ts[endidx] * (1 - endratio)
-            maskidx = maskidx[:-padgap]
-
-        spectrum_pad_np[maskidx] = spectrum_ts[maskidx]
-        # concatenate
-        spectra_pad_sn = torch.cat((spectra_pad_sn, spectrum_pad_np.unsqueeze(0).to(device)), dim=0)
-
-    spectra_n = spectra_pad_sn.to(device_o)
-
-    return spectra_n
+    spectra_padded = areg.pad(spectra_input, propdata_input,smoothing=True)
+    spectra_padded = spectra_padded.reshape(spectra_padded.shape[0],-1)
+    spectra_padded = spectra_padded[:,50:]
+    return spectra_padded
 
 
 
