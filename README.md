@@ -3,7 +3,7 @@ The Soil Optical Generative Model (SOGM) is a soil spectra simulation model that
 
 Additionally, the SOGM is packaged with the PROSAIL model, which combines the PROSPECT-5, D, and 4SAIL models.
 
-Citation: Lei, T., & Bailey, B. N. (2024). A text-based, generative deep learning model for soil reflectance spectrum simulation in the VIS-NIR (400-2499 nm) bands. arXiv preprint arXiv:2405.01060.
+Citation: Lei, T., & Bailey, B. N. (2025). A text-based, generative deep learning model for soil reflectance spectrum simulation in the solar range (400–2499 nm). Remote Sensing of Environment, 318, 114527.
 
 Example of input properties:
 
